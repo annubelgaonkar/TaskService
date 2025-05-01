@@ -57,10 +57,13 @@ public class TaskController {
     //regular USERS: Can only delete tasks they created
 
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<String> deleteTask(@PathVariable Long id,
+                                             HttpServletRequest request) {
+
         String email = jwtUtil.extractUsernameFromHeader(request);
         boolean isAdmin = jwtUtil.extractRoleFromHeader(request).equals("ADMIN");
         taskService.deleteTask(id, email, isAdmin);
+        return new ResponseEntity<>("Task deleted successfully.", HttpStatus.OK);
     }
     @PutMapping("/{id}")
     public Task updateTask(@PathVariable Long id,
