@@ -1,4 +1,4 @@
-package dev.anuradha.taskservice;
+package dev.anuradha.taskservice.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,4 +26,6 @@ public class Task {
     private String createdBy; // Email or user ID
 
     private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
 }

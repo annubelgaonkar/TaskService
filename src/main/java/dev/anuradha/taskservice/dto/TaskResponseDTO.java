@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class TaskResponse {
+public class TaskResponseDTO {
     private Long id;
     private String title;
     private String description;
