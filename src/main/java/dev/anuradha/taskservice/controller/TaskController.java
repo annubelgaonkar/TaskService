@@ -8,8 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -25,15 +27,10 @@ public class TaskController {
         this.jwtUtil = jwtUtil;
     }
 
-//    @PostMapping
-//    public Task createTask(@RequestBody TaskRequestDTO request, HttpServletRequest httpRequest) {
-//        String email = jwtUtil.extractUsernameFromHeader(httpRequest);
-//        return taskService.createTask(email, request);
-//    }
     @PostMapping
-    public ResponseEntity<String> createTask(@RequestBody TaskRequestDTO request, HttpServletRequest servletRequest) {
-        String username = jwtUtil.extractUsernameFromHeader(servletRequest);
-        return ResponseEntity.ok("Task created for user: " + username);
+    public Task createTask(@RequestBody TaskRequestDTO request, HttpServletRequest httpRequest) {
+        String email = jwtUtil.extractUsernameFromHeader(httpRequest);
+        return taskService.createTask(email, request);
     }
 
     @GetMapping
@@ -42,13 +39,23 @@ public class TaskController {
         return taskService.getTasksForUser(email);
     }
 
+
+    //for ADMIN only
     @GetMapping("/all")
-    public List<Task> getAllTasks(HttpServletRequest request) {
+    public List<Task> getAllTasks(HttpServletRequest request)
+    {
         String email = jwtUtil.extractUsernameFromHeader(request);
         boolean isAdmin = jwtUtil.extractRoleFromHeader(request).equals("ADMIN");
-        if (!isAdmin) throw new RuntimeException("Access Denied");
+
+        if (!isAdmin) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied");
+        }
         return taskService.getAllTasks();
     }
+
+    //For ADMIN: Can delete any task
+    //regular USERS: Can only delete tasks they created
+
     @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Long id, HttpServletRequest request) {
         String email = jwtUtil.extractUsernameFromHeader(request);

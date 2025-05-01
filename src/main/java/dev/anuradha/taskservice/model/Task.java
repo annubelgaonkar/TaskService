@@ -23,9 +23,12 @@ public class Task {
     private String title;
     private String description;
 
-    private String createdBy; // Email or user ID
-
+    @Column(name = "created_by")
+    private String createdBy; //
+    // Email or user ID
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 }

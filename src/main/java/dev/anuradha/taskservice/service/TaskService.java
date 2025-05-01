@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-@NoArgsConstructor
+
+@AllArgsConstructor
 @Service
 @Setter
 @Getter
@@ -27,11 +28,7 @@ public class TaskService {
     private TaskRepository taskRepository;
     private JwtUtil jwtUtil;
 
-    public TaskService(TaskRepository taskRepository,
-                       JwtUtil jwtUtil) {
-        this.taskRepository = taskRepository;
-        this.jwtUtil = jwtUtil;
-    }
+
     @Transactional
     public Task createTask(String userEmail, TaskRequestDTO request) {
         Task task = new Task();
