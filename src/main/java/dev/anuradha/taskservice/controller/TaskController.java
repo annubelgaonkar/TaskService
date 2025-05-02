@@ -28,29 +28,31 @@ public class TaskController {
     }
 
     @PostMapping
-    public Task createTask(@RequestBody TaskRequestDTO request, HttpServletRequest httpRequest) {
+    public ResponseEntity<Task> createTask(@RequestBody TaskRequestDTO request, HttpServletRequest httpRequest) {
         String email = jwtUtil.extractUsernameFromHeader(httpRequest);
-        return taskService.createTask(email, request);
+        Task createdTask = taskService.createTask(email, request);
+        return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<Task> getUserTasks(HttpServletRequest request) {
+    public ResponseEntity<List<Task>> getUserTasks(HttpServletRequest request) {
         String email = jwtUtil.extractUsernameFromHeader(request);
-        return taskService.getTasksForUser(email);
+        List<Task> tasks = taskService.getTasksForUser(email);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
-
 
     //for ADMIN only
     @GetMapping("/all")
-    public List<Task> getAllTasks(HttpServletRequest request)
+    public ResponseEntity<List<Task>> getAllTasks(HttpServletRequest request)
     {
         String email = jwtUtil.extractUsernameFromHeader(request);
         boolean isAdmin = jwtUtil.extractRoleFromHeader(request).equals("ADMIN");
 
         if (!isAdmin) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied");
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
-        return taskService.getAllTasks();
+        List<Task> tasks = taskService.getAllTasks();
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
     //For ADMIN: Can delete any task
@@ -65,10 +67,13 @@ public class TaskController {
         taskService.deleteTask(id, email, isAdmin);
         return new ResponseEntity<>("Task deleted successfully.", HttpStatus.OK);
     }
+
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id,
+    public ResponseEntity<Task> updateTask(@PathVariable Long id,
                            @RequestHeader("Authorization") String token,
                            @RequestBody Task task) {
-        return taskService.updateTask(id, token, task.getTitle(), task.getDescription(), task.getStatus());
+        Task updatedTask = taskService.updateTask(id, token, task.getTitle(), task.getDescription(), task.getStatus());
+        return new ResponseEntity<>(updatedTask, HttpStatus.OK);
     }
+
 }
